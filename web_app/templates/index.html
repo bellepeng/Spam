@@ -1,0 +1,90 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing-page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type='text/javascript' src="{{url_for('static', filename='js/jquery2.js') }}"></script>
+  </head>
+
+  <header class="main-header" role="banner">
+    <div id="banner">
+    <h1>Ham or Spam?</h1>
+    <!-- <p>Here you can enter the text of your email or upload a .eml and I'll predict whether it is a Spam or Ham! </p></p> -->
+      <!-- <img src="/static/images/banner.jpg" alt="banner" /> -->
+      <div id="Ham or Spam?">
+      </div>
+    </div>
+  </header>
+
+  <body>
+
+  <div  class='my_container'>
+    <div>
+      <p>Upload your email here </p>
+      <form method=POST enctype=multipart/form-data id='file' action='/upload' >
+            <input type=file name=upload_file>
+            <input type="submit" value="Upload">
+      </form>
+
+
+      <p>...Or Paste your email below </p>
+      <textarea rows="15" cols="80"
+                id='email_text'
+                onclick='updateScore()'
+                placeholder='Please paste your email here'>{{email_text}}</textarea>
+      <br />
+      <button id='do_it' onclick='updateScore()'>Submit for Spam Score</button>
+    </div>
+
+    <div>
+      <p>This Email is Likely: <div id="hard_pred">?</div></p>
+      <p>The Probability of it being a Spam is: <div id="soft_pred">?</div></p>
+
+      <div class='Image'>
+        <img id='image_result' src='/static/images/{{result}}.jpg' />
+      </div>
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <div id="footer">
+      <img src="/static/images/banner.jpg" alt="banner" />
+    </div>
+  </footer>
+
+
+    <script type='text/javascript' src="{{url_for('static', filename='js/jquery.js') }}"></script>
+
+    <script>
+    function updateScore(){
+      const theEmail = document.getElementById('email_text').value;
+      const outputSoft = document.getElementById('soft_pred');
+      const outputHard = document.getElementById('hard_pred');
+      if (theEmail.length < 15) {
+          outputSoft.textContent = 'Need more text to provide result';
+          return;
+      }
+
+      $.ajax({
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        url: '/spam_score',
+        async: true,
+        data: JSON.stringify({
+          email: theEmail
+        }),
+        success: (response) => {
+          outputHard.textContent = response.prediction
+          outputSoft.textContent = response.score;
+          $('#image_result').attr('src', '/static/images/' + response.prediction + '.jpg' )
+        },
+        error: (response) => {
+          outputSoft.textContent = 'INVALID';
+          outputHard.textContent = 'INVALID';
+        }
+      })
+    }
+    </script>
+
+  </body>
+
+</html>

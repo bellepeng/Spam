@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+  </head>
+  <body>
+    <h1>Sentiment analyser</h1>
+
+    <div class="user-input">
+      <textarea rows="4" cols="50"
+                id='email_text'
+                onkeydown='updateScore()'
+                placeholder='Please copy and paste your email here'></textarea>
+      <br />
+      <button id='do_it' onclick='updateScore()'>Submit</button>
+    </div>
+
+    <div class='result'>
+      <p>Email Prediction Result: <div id="output">?</div></p>
+    </div>
+
+    <div class='smile'>
+      <svg>
+      </svg>
+    </div>
+
+    <script type='text/javascript' src="{{url_for('static', filename='js/jquery.js') }}"></script>
+
+    <!-- It is WAY more readable to have your javascript served from a separate file
+         (and we can reuse it too) -->
+    <script type='text/javascript' src="{{url_for('static', filename='js/updateScore.js')}}">
+    </script>
+
+    <script type='text/javascript' src="{{url_for('static', filename='js/smile.js')}}">
+    </script>
+
+  </body>
+
+</html>

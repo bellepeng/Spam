@@ -1,0 +1,62 @@
+{%- extends 'base.html' %}
+
+{% import "bootstrap/utils.html" as utils %}
+
+{% block content %}
+  <head>
+  </head>
+  <body>
+    <h1>Ham or Spam?</h1>
+
+    <p>Upload your email here </p>
+    <form method=POST enctype=multipart/form-data id='file' action='/upload' >
+          <input type=file name=upload_file>
+          <input type="submit" value="Submit">
+    </form>
+
+
+    <p>...Or Paste your email below </p>
+    <textarea rows="25" cols="100"
+              id='email_text'
+              onclick='updateScore()'
+              placeholder='Please paste your email here'>{{email_text}}</textarea>
+    <br />
+    <button id='do_it' onclick='updateScore()'>Submit</button>
+
+    <p>This Email is Likely: <div id="hard_pred">?</div></p>
+    <p>The Probability of it being a Spam is: <div id="soft_pred">?</div></p>
+  {%- endblock %}
+
+  {% block scripts %}
+    <script type='text/javascript' src="{{url_for('static', filename='js/jquery.js') }}"></script>
+
+    <script>
+    function updateScore(){
+      const theEmail = document.getElementById('email_text').value;
+      const outputSoft = document.getElementById('soft_pred');
+      const outputHard = document.getElementById('hard_pred');
+      if (theEmail.length < 15) {
+          outputSoft.textContent = 'Need more text to provide result';
+          return;
+      }
+
+      $.ajax({
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        url: '/spam_score',
+        async: true,
+        data: JSON.stringify({
+          email: theEmail
+        }),
+        success: (response) => {
+          outputHard.textContent = response.prediction
+          outputSoft.textContent = response.score;
+        },
+        error: (response) => {
+          outputSoft.textContent = 'INVALID';
+          outputHard.textContent = 'INVALID';
+        }
+      })
+    }
+    </script>
+{%- endblock %}
